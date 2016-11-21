@@ -7,10 +7,10 @@ module Hanami
       CONTENT_TYPE       = 'CONTENT_TYPE'.freeze
       MEDIA_TYPE_MATCHER = /\s*[;,]\s*/.freeze
 
-      RACK_INPUT    = 'rack.input'.freeze
-      ROUTER_PARAMS = 'router.params'.freeze
+      RACK_INPUT = 'rack.input'.freeze
+      ROUTER_PATH_PARAMS = 'router.path_params'.freeze
       ROUTER_PARSED_BODY = 'router.parsed_body'.freeze
-      FALLBACK_KEY  = '_'.freeze
+      FALLBACK_KEY = '_'.freeze
 
       def initialize(parsers)
         @parsers = prepare(parsers)
@@ -48,19 +48,10 @@ module Hanami
 
           env[RACK_INPUT].rewind    # somebody might try to read this stream
 
-          env[ROUTER_PARAMS] ||= {} # prepare params
+          env[ROUTER_PATH_PARAMS] ||= {} # prepare params
           env[ROUTER_PARSED_BODY] = _parse(env, body)
-          env[ROUTER_PARAMS]      = _symbolize(env[ROUTER_PARSED_BODY]).merge(env[ROUTER_PARAMS])
 
           env
-        end
-      end
-
-      def _symbolize(body)
-        if body.is_a?(Hash)
-          Utils::Hash.new(body).deep_dup.symbolize!.to_h
-        else
-          { FALLBACK_KEY => body }
         end
       end
 
